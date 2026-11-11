@@ -2,6 +2,8 @@
 
 JetBrains IDEA agent preset for DeepSeek Harness. The preset connects DSH to the IDEA MCP Server, so the agent can work with the project the way the IDE sees it: project files, symbol search, inspections, builds, run configurations, debugger sessions, and database metadata.
 
+![IDEA 模式](assets/preset-menu.png)
+
 [中文说明](#中文说明) · [Install](#install) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting)
 
 ## What it provides
