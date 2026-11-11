@@ -1,6 +1,12 @@
 # dsh-idea-mode
 
-JetBrains IDEA agent preset for DeepSeek Harness. The preset connects DSH to the IDEA MCP Server, so the agent can work with the project the way the IDE sees it: project files, symbol search, inspections, builds, run configurations, debugger sessions, and database metadata.
+JetBrains IDEA agent preset for DeepSeek Harness.
+
+Use IDEA project files, symbol search, builds, run configurations, and debugging directly from DSH. It fits Java, Spring Boot, and Vue projects already open in IDEA.
+
+```sh
+dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
+```
 
 ![IDEA 模式](assets/preset-menu.png)
 
