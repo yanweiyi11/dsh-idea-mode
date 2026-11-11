@@ -31,7 +31,6 @@ From the DSH plugin manager, install `dsh-idea-mode` and enable the bundle. From
 
 ```sh
 dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
-dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode/releases/latest/download/dsh-idea-mode.tgz
 ```
 
 Restart DSH after installation, create or open a session, and select the `IDEA` preset.
