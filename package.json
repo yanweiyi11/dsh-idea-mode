@@ -1,0 +1,50 @@
+{
+  "name": "dsh-idea-mode",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "JetBrains IDEA agent preset for DeepSeek Harness with IDE MCP tools, tool policy, and compatibility helpers.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanweiyi11/dsh-idea-mode.git"
+  },
+  "homepage": "https://github.com/yanweiyi11/dsh-idea-mode#readme",
+  "bugs": {
+    "url": "https://github.com/yanweiyi11/dsh-idea-mode/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "jetbrains",
+    "intellij",
+    "idea",
+    "mcp"
+  ],
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./policy": "./lib/policy.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/*.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "icon.png"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "icon": "./icon.svg",
+  "publishConfig": {
+    "access": "public"
+  }
+}

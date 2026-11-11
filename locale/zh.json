@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "IDEA 模式",
+    "description": "JetBrains IDEA 文件读写、代码搜索、构建、运行与调试的 agent preset。"
+  }
+}
