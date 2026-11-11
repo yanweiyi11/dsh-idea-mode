@@ -27,7 +27,7 @@ The default MCP endpoint is `http://127.0.0.1:64342/stream`. Override it with th
 
 ## Install
 
-From the DSH plugin manager, install `dsh-idea-mode` and enable the bundle. From the command line, install the GitHub repository or its prebuilt release tarball:
+From the DSH plugin manager, install `dsh-idea-mode` and enable the bundle. From the command line, install the GitHub repository:
 
 ```sh
 dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
