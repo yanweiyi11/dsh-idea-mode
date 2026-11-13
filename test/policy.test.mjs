@@ -29,7 +29,9 @@ function makeContext() {
             ? { parameters: { properties: { file_path: {}, offset: {}, limit: {}, projectPath: {} } } }
             : name === 'mcp__IDEA__execute_sql_query'
               ? { parameters: { properties: { queryText: {}, projectPath: {} } } }
-              : undefined,
+              : name === 'mcp__IDEA__search_file' || name === 'search_file'
+                ? { parameters: { properties: { q: {}, paths: {}, projectPath: {} } } }
+                : undefined,
         restrict: (filter) => {
           restrictions.push(filter)
           return () => {}
@@ -106,6 +108,16 @@ async function run() {
   preExecute(camelRead, () => ({ kind: 'allow' }))
   assert.equal(camelRead.arguments.file_path, 'src/Bar.java', 'camelCase argument renamed to file_path')
   assert.equal(camelRead.arguments.filePath, undefined, 'obsolete camelCase argument removed')
+
+  const fileSearch = {
+    name: 'search_file',
+    arguments: { pattern: '**/*.sql', path: 'D:/proj' },
+    agent: { session: { cwd: 'D:/proj' } },
+  }
+  preExecute(fileSearch, () => ({ kind: 'allow' }))
+  assert.equal(fileSearch.arguments.q, '**/*.sql', 'search_file pattern renamed to q')
+  assert.equal(fileSearch.arguments.pattern, undefined, 'obsolete search_file pattern removed')
+  assert.equal(fileSearch.arguments.projectPath, 'D:/proj', 'bare alias gets projectPath filled')
 
   const created = handlers.get('agent/created')
   assert.equal(typeof created, 'function', 'agent/created listener registered')
