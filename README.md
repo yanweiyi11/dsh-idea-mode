@@ -14,8 +14,11 @@ dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
 
 ## What it provides
 
-- A new `IDEA` agent preset.
-- IDEA MCP tools registered from `http://127.0.0.1:64342/stream`.
+- Two switchable registration modes, both off by default:
+  - **Create an IDEA preset** — an `IDEA` agent preset of its own.
+  - **Also available in standard mode** — no new preset; the IDEA MCP tools are mounted at the Host level, so standard-mode Agents can call them too.
+- A settings page (Plugins → `dsh-idea-mode`) for the IDEA MCP address and those two switches. Every field applies live, without restarting DSH.
+- IDEA MCP tools registered from the configured address (default `http://127.0.0.1:64342/stream`).
 - A policy layer that keeps IDEA calls usable:
   - fills a missing `projectPath` from the session working directory
   - normalizes snake_case and camelCase argument names such as `file_path` and `filePath`
@@ -31,7 +34,7 @@ dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
 - IntelliJ IDEA `2026.2` or newer with the MCP Server plugin enabled.
 - DSH and IDEA running under the same user on the same machine.
 
-The default MCP endpoint is `http://127.0.0.1:64342/stream`. Override it with the `IDEA_MCP_URL` environment variable when the MCP Server uses another port.
+The default MCP endpoint is `http://127.0.0.1:64342/stream`. Change it on the settings page, or set the `IDEA_MCP_URL` environment variable as the initial value used before anything is saved.
 
 ## Install
 
@@ -41,26 +44,38 @@ From the DSH plugin manager, install `dsh-idea-mode` and enable the bundle. From
 dsh plugin --profile <profile> add https://github.com/yanweiyi11/dsh-idea-mode
 ```
 
-Restart DSH after installation, create or open a session, and select the `IDEA` preset.
+Restart DSH once after installation. Then open **Plugins → dsh-idea-mode** and turn on the registration mode you want; nothing is registered while both switches are off.
 
 ## Configuration
 
-The preset is defined in [`cordis.patch.yml`](./cordis.patch.yml). The policy settings are:
+The settings page exposes three fields:
+
+| Field | Default | Meaning |
+| --- | --- | --- |
+| IDEA MCP address | `http://127.0.0.1:64342/stream` | The IDEA MCP endpoint. Must start with `http://` or `https://`. |
+| Create an IDEA preset | off | Register a dedicated `IDEA` agent preset carrying the IDEA tools and the policy layer. |
+| Also available in standard mode | off | Register no preset; mount the IDEA MCP server at the Host level instead, so every preset — including `standard` — can call `mcp__IDEA__*`. |
+
+The two switches compose freely: both on gives you the preset *and* Host-level tools, and turning either off removes exactly what it added. The settings row is `idea-mode` in the profile patch, and the values below are its defaults:
 
 ```yaml
-- id: idea-policy
-  name: 'dsh-idea-mode/policy'
+- id: idea-mode
+  name: 'dsh-idea-mode'
   config:
-    serverName: IDEA
-    allowSqlWrite: true
-    openAccess: true
+    mcpUrl: http://127.0.0.1:64342/stream
+    registerPreset: false
+    registerIntoStandard: false
 ```
 
-- `serverName`: MCP server name. It determines the `mcp__IDEA__*` tool prefix.
-- `allowSqlWrite`: when `true`, the IDEA `execute_sql_query` tool can change data. Use a read-only database account unless writes are intended.
-- `openAccess`: when `true`, local file tools and all IDEA tools stay visible. Set it to `false` to hide global file tools and router-only IDEA tools.
+Changes are applied live: the previous registration is withdrawn and rebuilt, so a new address takes effect on the running preset without a restart.
 
-The shipped defaults are intentionally open. Install this preset only for projects and database connections you trust.
+The policy layer (`dsh-idea-mode/policy`) rides along with whichever mode is active. Its defaults, set in code, are:
+
+- `serverName`: `IDEA`. It determines the `mcp__IDEA__*` tool prefix.
+- `allowSqlWrite`: `true`. When `false`, the IDEA `execute_sql_query` tool is restricted to read-only statements.
+- `openAccess`: `true`. When `false`, global file tools and router-only IDEA tools are hidden.
+
+The shipped defaults are intentionally open. Use this preset only for projects and database connections you trust.
 
 ## Troubleshooting
 
@@ -72,9 +87,16 @@ The shipped defaults are intentionally open. Install this preset only for projec
 ## Development
 
 ```sh
-node --check lib/policy.js
+node --check lib/index.js && node --check lib/policy.js && node --check client.js
 node test/policy.test.mjs
+node test/host.test.mjs
+node test/integration.test.mjs
 ```
+
+`test/integration.test.mjs` validates the produced preset definition and MCP entry
+against DSH's own schemas. It needs an installation to read them from; point
+`DSH_PACKAGE_ROOT` at it when the default locations do not apply, and note that
+it exits with code `2` when it had to skip those checks.
 
 ## License
 
@@ -88,8 +110,11 @@ MIT
 
 主要特性：
 
-- 新增 `IDEA` agent preset。
-- 接入 `http://127.0.0.1:64342/stream` 的 IDEA MCP 工具。
+- 两种可切换的注册方式，默认都关：
+  - **新建 IDEA 模式**：注册一个独立的 `IDEA` agent preset。
+  - **标准模式也可用**：不新建 preset，把 IDEA MCP 工具挂到 Host 层，标准模式的 Agent 也能直接调用。
+- 设置页（插件 → `dsh-idea-mode`）可改 IDEA MCP 地址与这两个开关，改完立即生效，不用重启。
+- 接入所配置地址（默认 `http://127.0.0.1:64342/stream`）的 IDEA MCP 工具。
 - 自动补全 `projectPath`，兼容 `file_path` 和 `filePath` 等参数命名差异。
 - 兼容 `mcp__IDEA__grep`、裸名 `search_file` 等常见工具名错误，并在结果中返回一条温和提示。
 - 项目外文件继续使用 DSH 本地 `read`、`glob`、`grep`、`write`、`edit`。
@@ -97,6 +122,10 @@ MIT
 - DSH 比 IDEA 先启动时会持续重连，IDEA 启动后自动恢复。
 
 安装前请确认 DSH 版本不低于 `0.2.2-rc.1`，IDEA 版本不低于 `2026.2`，并且 MCP Server 插件已启用。
+
+装好后打开一次「插件 → dsh-idea-mode」，按需打开注册方式；两个开关都关时不注册任何东西。
+
+设置页有三个字段：IDEA MCP 地址、新建 IDEA 模式、标准模式也可用。两个开关互相独立，可以只开一个、两个都开或都关；关掉某个开关会精确撤掉它加的东西，不留残留。改动走热重载——旧注册先撤下，再按新配置重建，所以换地址不用重启。
 
 默认配置启用了 `openAccess` 和 `allowSqlWrite`。请只在可信项目和数据库连接上使用；执行 SQL 时建议使用只读账号。
 
