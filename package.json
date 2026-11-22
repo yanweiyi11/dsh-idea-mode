@@ -24,15 +24,20 @@
   "engines": {
     "dsh": ">=0.2.2-rc.1 <0.3.0-0"
   },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "~3.19.0"
+  },
   "exports": {
     ".": "./lib/index.js",
     "./policy": "./lib/policy.js",
+    "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
     "lib/*.js",
+    "client.js",
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",
@@ -41,10 +46,21 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
     }
   },
   "icon": "./icon.svg",
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "test": "node test/policy.test.mjs && node test/host.test.mjs && node test/client.test.mjs && node test/integration.test.mjs",
+    "check": "node --check lib/index.js && node --check lib/policy.js && node --check lib/preset.js && node --check client.js"
   }
 }

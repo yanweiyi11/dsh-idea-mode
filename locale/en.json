@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "IDEA mode",
-    "description": "JetBrains IDEA file access, code search, build, run, and debug agent preset."
+    "description": "A JetBrains IDEA agent preset for file, search, build, run and debug work; register it as its own preset or mount the tools into standard mode."
   }
 }
